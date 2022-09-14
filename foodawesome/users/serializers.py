@@ -14,9 +14,11 @@ class LoginSerializer(serializers.Serializer):
 
     # Function used to verify login. Returns User if valid
     def verify(self, data):
+
+        
         # Try to verify user with login data being username
         user=authenticate(username=data['login'], password=data['password'])
-
+        print(user)
         # If user is None given login might be email
         if user is None: 
             # Try to find user by email
@@ -60,3 +62,10 @@ class RegisterSerializer(serializers.Serializer):
         user.save()
 
         return user
+
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=User
+        fields=('username', 'is_active')
