@@ -12,6 +12,9 @@ from rest_framework import status
 from django.contrib.auth.models import User
 from .serializers import LoginSerializer, RegisterSerializer, UserSerializer
 
+#tokens
+from .tokensUtil import getUserToken
+
 
 def main(request):
     return HttpResponse("AUTH PATH")
@@ -25,7 +28,6 @@ def send_test_mail(request):
         from_email=settings.EMAIL_HOST_USER,
         recipient_list=['kacper.chrostowski@gmail.com']
     )
-
     return HttpResponse("MAIL SENT")
 
 
@@ -41,12 +43,9 @@ class LoginView(APIView):
             if(user is None):
                 return Response(status=status.HTTP_404_NOT_FOUND)
 
-            myRequest=HttpRequest()
-            myRequest.method="POST"
+            tokens=getUserToken(user)
 
-            payload={'username': user.get_username, 'password':request.data['']}
-
-            print(payload)
+            return Response(tokens,status=status.HTTP_200_OK)
 
 
 
