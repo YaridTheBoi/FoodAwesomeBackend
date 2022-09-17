@@ -11,6 +11,9 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
 from pathlib import Path
+
+from datetime import timedelta
+
 import environ
 
 # Open .env file 
@@ -47,7 +50,8 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework_simplejwt',
     'api.apps.ApiConfig',
-    'users.apps.UsersConfig'
+    'users.apps.UsersConfig',
+    'rest_framework.authtoken'
 ]
 
 MIDDLEWARE = [
@@ -100,6 +104,12 @@ REST_FRAMEWORK={
     )
 }
 
+# JWT Settings
+SIMPLE_JWT={
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),
+    'AUTH_HEADER_TYPES': ('Bearer',),
+    # In request head put: Bearer <token>
+}
 
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases

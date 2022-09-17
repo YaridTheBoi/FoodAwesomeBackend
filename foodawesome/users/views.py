@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponse, HttpRequest
 from django.core.mail import send_mail
 from django.conf import settings
+from django.urls import reverse
 
 #api framework
 from rest_framework.views import APIView
@@ -14,7 +15,7 @@ from .serializers import LoginSerializer, RegisterSerializer, UserSerializer
 
 #tokens
 from .tokensUtil import getUserToken
-
+from rest_framework.authtoken.models import Token
 
 def main(request):
     return HttpResponse("AUTH PATH")
@@ -63,4 +64,33 @@ class RegisterView(APIView):
         serializer=RegisterSerializer(data=request.data)
         if serializer.is_valid():
             newUser=serializer.create(serializer.verify(request.data))
+            if(newUser is None):
+                return Response(status=status.HTTP_409_CONFLICT)
+
+
+            token, created=Token.objects.get_or_create(user=newUser)
+            link=request.META['HTTP_HOST']+reverse('verify-register', args=[token.key, newUser.id])
+            send_mail(
+                subject='Register Confirmation',
+                message='Token: '+ link ,
+                from_email=settings.EMAIL_HOST_USER,
+                recipient_list=[newUser.email]
+            )
+
             return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+class VerifyRegisterView(APIView):
+
+    def get(self, request, token, user_id):
+        userFromUrl=User.objects.get(id=user_id)
+        tokenFromUser=Token.objects.get(user=userFromUrl)
+
+        if(tokenFromUser.key==token):
+            userFromUrl.is_active=True
+            userFromUrl.save()
+
+            return Response(status=status.HTTP_200_OK)
+
+        return Response(status=status.HTTP_404_NOT_FOUND)

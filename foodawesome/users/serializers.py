@@ -54,15 +54,17 @@ class RegisterSerializer(serializers.Serializer):
 
     #Create new user and return it
     def create(self, val_data):
-        user=User.objects.create(username=val_data['username'],
-                                email=val_data['email'],
-                                is_active=False)
+        try:
+            user=User.objects.create(username=val_data['username'],
+                                    email=val_data['email'],
+                                    is_active=False)     #change it later
 
-        user.set_password(val_data['password'])
-        user.save()
+            user.set_password(val_data['password'])
+            user.save()
 
-        return user
-
+            return user
+        except:
+            return None
 
 
 class UserSerializer(serializers.ModelSerializer):
