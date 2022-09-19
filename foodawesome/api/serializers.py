@@ -16,6 +16,9 @@ class RecipeSerializer(serializers.ModelSerializer):
 class CreateRecipeSerializer(serializers.Serializer):
     title=serializers.CharField(style={"placeholder": "Title"})
     ingredients=serializers.CharField(style={"placeholder": "Ingredients"})
+    description=serializers.CharField(style={'placeholder': 'description'})
+    dish_type=serializers.CharField(style={'placeholder': 'description'})
+    
     extra_kwargs={'title':{'required': True}, 
                     'ingredients': {'required':True},
                     'description': {'required':True},
@@ -39,3 +42,6 @@ class CreateRecipeSerializer(serializers.Serializer):
         recipe.save()
 
         return recipe
+
+
+
