@@ -8,7 +8,7 @@ class Recipe(models.Model):
     description=models.TextField(null=False)
     
     #======THIS IS REMOVED FOR EARLY DEVELOPMENT, WILL COME BACK SOON======="
-    #author=models.ForeignKey(User, on_delete=models.CASCADE, null=False)
+    author=models.ForeignKey(User, on_delete=models.CASCADE)
     
     create_date=models.DateField(auto_now_add=True)
     

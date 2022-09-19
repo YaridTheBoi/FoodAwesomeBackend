@@ -20,3 +20,22 @@ class CreateRecipeSerializer(serializers.Serializer):
                     'ingredients': {'required':True},
                     'description': {'required':True},
                     'dish_type': {'required': True}}
+
+
+    def create(self, request):
+        val_data=request.data
+        authorId=User.objects.filter(id=request.user.id).first()
+        print(authorId)
+        try:
+            recipe=Recipe.objects.create(author=authorId,
+                                        title=val_data['title'],
+                                        ingredients=val_data['ingredients'],
+                                        description=val_data['description'],
+                                        dish_type=val_data['dish_type'])
+
+        except:
+            return None
+        
+        recipe.save()
+
+        return recipe
