@@ -28,7 +28,7 @@ class CreateRecipeSerializer(serializers.Serializer):
     def create(self, request):
         val_data=request.data
         authorId=User.objects.filter(id=request.user.id).first()
-        print(authorId)
+        
         try:
             recipe=Recipe.objects.create(author=authorId,
                                         title=val_data['title'],
@@ -44,4 +44,18 @@ class CreateRecipeSerializer(serializers.Serializer):
         return recipe
 
 
+    def update(self, request, id):
+        val_data=request.data
+        authorId=User.objects.filter(id=request.user.id).first()
+    
+        try:
+            recipe=Recipe.objects.filter(id=id).update(
+                                            title=val_data['title'],
+                                            ingredients=val_data['ingredients'],
+                                            description=val_data['description'],
+                                            dish_type=val_data['dish_type'])
+                                        
+        except:
+            return None
 
+        return recipe

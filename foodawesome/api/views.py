@@ -12,7 +12,7 @@ from rest_framework.permissions import IsAuthenticated, BasePermission, SAFE_MET
 #serializers, models
 from .serializers import RecipeSerializer, CreateRecipeSerializer
 from .models import Recipe
-
+from django.contrib.auth.models import User
 
 def main(request):
     return HttpResponse("API PATH")
@@ -75,10 +75,25 @@ class RecipeDetailed(APIView):
 
 
     def put(self, request, id):
-        recipe=self.get_recipe_by_id(id)
-        serializer=RecipeSerializer(recipe, data=request.data)
+        serializer=CreateRecipeSerializer(data=request.data)
+        recipeToEdit=Recipe.objects.get(id=id)
+        requestUser=User.objects.get(id=request.user.id)
+
+        if(recipeToEdit.author!=requestUser):
+            return Response( status=status.HTTP_401_UNAUTHORIZED)
+
         if(serializer.is_valid()):
-            serializer.save()
+            editedRecipe=serializer.update(request, id)
+            if(editedRecipe is None):
+                return Response(status=status.HTTP_404_NOT_FOUND)
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
+class StatsView(APIView):
+    def get(self, request):
+        users_amount=User.objects.all().count()
+        recipes_amount=Recipe.objects.all().count()
+
+        response={'users': users_amount, 'recipes':recipes_amount}
+        return Response(response, status=status.HTTP_200_OK)
