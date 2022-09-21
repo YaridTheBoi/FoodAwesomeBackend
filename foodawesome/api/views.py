@@ -1,3 +1,6 @@
+#other
+import random
+
 #django
 from django.shortcuts import render
 from django.http import HttpResponse, Http404
@@ -17,6 +20,8 @@ from django.contrib.auth.models import User
 def main(request):
     return HttpResponse("API PATH")
 
+
+
 #=====READ ONLY PERMISSION=====
 class ReadOnly(BasePermission):
     def has_permission(self, request, view):
@@ -27,7 +32,7 @@ class ReadOnly(BasePermission):
 
 #=====BASIC VIEW=====
 class RecipeList(APIView):
-    permission_classes=[IsAuthenticated]
+    permission_classes=[IsAuthenticated|ReadOnly]
     serializer_class=RecipeSerializer
     queryset=Recipe.objects.all()
     
@@ -47,9 +52,9 @@ class RecipeList(APIView):
 
 
 
-
+#=====DETAILED VIEW=====
 class RecipeDetailed(APIView):
-    permission_classes=[IsAuthenticated]
+    permission_classes=[IsAuthenticated|ReadOnly]
     queryset=Recipe.objects.all()
     serializer_class=RecipeSerializer
 
@@ -90,10 +95,21 @@ class RecipeDetailed(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+
+#=====STATS VIEW=====
 class StatsView(APIView):
     def get(self, request):
-        users_amount=User.objects.all().count()
-        recipes_amount=Recipe.objects.all().count()
+        usersAmount=User.objects.all().count()
+        recipesAmount=Recipe.objects.all().count()
 
-        response={'users': users_amount, 'recipes':recipes_amount}
+        response={'users': usersAmount, 'recipes':recipesAmount}
         return Response(response, status=status.HTTP_200_OK)
+
+
+#=====RANDOM RECIPE VIEW=====
+class RandomRecipeView(APIView):
+    def get(self, request):
+        allRecipesId=Recipe.objects.values_list('id', flat=True)
+        randomRecipe=Recipe.objects.get(id=random.choice(allRecipesId))
+        serializer=RecipeSerializer(randomRecipe)        
+        return Response(serializer.data, status=status.HTTP_200_OK)
