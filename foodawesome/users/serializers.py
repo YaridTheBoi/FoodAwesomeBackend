@@ -71,3 +71,45 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model=User
         fields=('username', 'is_active')
+
+class ForgotPasswordSerializer(serializers.Serializer):
+    email=serializers.CharField(style={'placeholder': 'Email'})
+
+    #Checks if user of given email exist and if so return it's object
+    def checkUser(self, data):
+        try:
+            user=User.objects.get(email=data['email'])
+        except:
+            return None
+        
+        return user
+
+
+class ResetPasswordSerializer(serializers.Serializer):
+    newPassword=serializers.CharField(
+        style= {'placeholder': 'New Password', 'input_type':'password'}
+    )
+    repeatNewPassword=serializers.CharField(
+        style= {'placeholder': 'Repeat New Password', 'input_type':'password'}
+    )
+
+    def verify(self, data):
+        if(data['newPassword']!=data['repeatNewPassword']):
+            return None
+        return data
+
+    def changeUsersPassword(self, data, userId):
+        if data is None:
+            return None
+
+        user=User.objects.get(id=userId)
+
+        #===DEV ONLY===
+        if user is None:
+            print("Cholera powinno wyjsc inaczej")
+            return None
+
+        user.set_password(data['password'])
+        user.save()
+
+        return user

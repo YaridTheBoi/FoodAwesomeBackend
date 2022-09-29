@@ -11,7 +11,7 @@ from rest_framework import status
 
 #models
 from django.contrib.auth.models import User
-from .serializers import LoginSerializer, RegisterSerializer, UserSerializer
+from .serializers import LoginSerializer, RegisterSerializer, UserSerializer, ForgotPasswordSerializer, ResetPasswordSerializer
 
 #tokens
 from .tokensUtil import getUserToken
@@ -83,8 +83,8 @@ class RegisterView(APIView):
 
 class VerifyRegisterView(APIView):
 
-    def get(self, request, token, user_id):
-        userFromUrl=User.objects.get(id=user_id)
+    def get(self, request, token, userId):
+        userFromUrl=User.objects.get(id=userId)
         tokenFromUser=Token.objects.get(user=userFromUrl)
 
         if(tokenFromUser.key==token):
@@ -94,3 +94,42 @@ class VerifyRegisterView(APIView):
             return Response(status=status.HTTP_200_OK)
 
         return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+
+class ForgotPasswordView(APIView):
+    def post(self, request):
+        serializer=ForgotPasswordSerializer(data=request.data)
+        if serializer.is_valid():
+            user=serializer.checkUser(request.data)
+            if user is None:
+                return Response(status=status.HTTP_404_NOT_FOUND)
+            
+            token, created=Token.objects.get_or_create(user=user)
+            link=request.META['HTTP_HOST']+reverse('reset-password', args=[token.key, user.id])
+            send_mail(
+                subject='Reset password',
+                message='Reset password link: '+ link ,
+                from_email=settings.EMAIL_HOST_USER,
+                recipient_list=[user.email]
+            )
+
+            return Response(status=status.HTTP_200_OK)
+
+class ResetPasswordView(APIView):
+    def get(self, request, token, userId):
+        serializer=ResetPasswordSerializer(data=request.data)
+        if serializer.is_valid():
+            userFromUrl=User.objects.get(id=userId)
+            tokenFromUser=Token.objects.get(user=userFromUrl)
+
+            if(tokenFromUser.key==token):
+                
+                user=serializer.changeUsersPassword(serializer.verify(request.data), userId)
+
+                if(user in not None):
+                    return Response(status=status.HTTP_200_OK)
+
+
+                return Response(status=status.HTTP_400_BAD_REQUEST)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
