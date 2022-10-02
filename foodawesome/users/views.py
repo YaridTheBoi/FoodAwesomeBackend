@@ -98,6 +98,7 @@ class VerifyRegisterView(APIView):
 
 
 class ForgotPasswordView(APIView):
+    serializer_class=ForgotPasswordSerializer
     def post(self, request):
         serializer=ForgotPasswordSerializer(data=request.data)
         if serializer.is_valid():
@@ -117,9 +118,11 @@ class ForgotPasswordView(APIView):
             return Response(status=status.HTTP_200_OK)
 
 class ResetPasswordView(APIView):
-    def get(self, request, token, userId):
+    serializer_class=ResetPasswordSerializer
+    def post(self, request, token, userId):
         serializer=ResetPasswordSerializer(data=request.data)
         if serializer.is_valid():
+            print('is Valid')
             userFromUrl=User.objects.get(id=userId)
             tokenFromUser=Token.objects.get(user=userFromUrl)
 
@@ -127,7 +130,7 @@ class ResetPasswordView(APIView):
                 
                 user=serializer.changeUsersPassword(serializer.verify(request.data), userId)
 
-                if(user in not None):
+                if(user is not None):
                     return Response(status=status.HTTP_200_OK)
 
 

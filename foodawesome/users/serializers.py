@@ -109,7 +109,7 @@ class ResetPasswordSerializer(serializers.Serializer):
             print("Cholera powinno wyjsc inaczej")
             return None
 
-        user.set_password(data['password'])
+        user.set_password(data['newPassword'])
         user.save()
 
         return user
