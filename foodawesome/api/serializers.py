@@ -25,16 +25,26 @@ class CreateRecipeSerializer(serializers.Serializer):
                     'dish_type': {'required': True}}
 
 
+    def verifyType(self, type):
+        if(any(type.upper() in i for i in Recipe.DISH_TYPES)):
+            return type.upper()
+        else:
+            return 'OT'
+
+
     def create(self, request):
         val_data=request.data
         authorId=User.objects.filter(id=request.user.id).first()
         
+
+
+
         try:
             recipe=Recipe.objects.create(author=authorId,
                                         title=val_data['title'],
                                         ingredients=val_data['ingredients'],
                                         description=val_data['description'],
-                                        dish_type=val_data['dish_type'])
+                                        dish_type=self.verifyType(val_data['dish_type']))
 
         except:
             return None
@@ -42,6 +52,9 @@ class CreateRecipeSerializer(serializers.Serializer):
         recipe.save()
 
         return recipe
+
+
+        
 
 
     def update(self, request, id):
@@ -53,9 +66,11 @@ class CreateRecipeSerializer(serializers.Serializer):
                                             title=val_data['title'],
                                             ingredients=val_data['ingredients'],
                                             description=val_data['description'],
-                                            dish_type=val_data['dish_type'])
+                                            dish_type=self.verifyType(val_data['dish_type']))
                                         
         except:
             return None
+
+
 
         return recipe

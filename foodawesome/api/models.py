@@ -14,11 +14,13 @@ class Recipe(models.Model):
 
     #=====CODE BELOW ALLOWS TO EASILY PICK DISH TYPE=====
     DISH_TYPES=(
+
         ('BF', 'Breakfast'),
         ('LU', 'Lunch'),
         ('DN', 'Dinner'),
         ('DE', 'Dessert'),
         ('OT', 'Other'),
+        
     )
 
     dish_type=models.CharField(max_length=2, choices=DISH_TYPES, 
