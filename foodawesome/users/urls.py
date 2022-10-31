@@ -13,7 +13,7 @@ urlpatterns = [
     path('token/', TokenObtainPairView.as_view()),
     path('token/refresh', TokenRefreshView.as_view()),
     path('token/verify', TokenVerifyView.as_view()),
-    path('login', LoginView.as_view()),
+    path('login', LoginView.as_view(), name='login'),
     path('register', RegisterView.as_view()),
     path('verify-register/<str:token>/<int:userId>', VerifyRegisterView.as_view(), name='verify-register'),
     path('forgot-password', ForgotPasswordView.as_view()),
