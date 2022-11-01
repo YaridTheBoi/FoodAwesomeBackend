@@ -35,6 +35,7 @@ def send_test_mail(request):
 class LoginView(APIView):
     serializer_class=LoginSerializer
     def post(self, request):
+
         serializer=LoginSerializer(data=request.data)
 
         if serializer.is_valid():
@@ -69,7 +70,9 @@ class RegisterView(APIView):
 
 
             token, created=Token.objects.get_or_create(user=newUser)
-            link=request.META['HTTP_HOST']+reverse('verify-register', args=[token.key, newUser.id])
+            link=settings.BACKEND_URL +reverse('verify-register', args=[token.key, newUser.id])
+            #link='xd'
+            #print(link)
             send_mail(
                 subject='Register Confirmation',
                 message='Token: '+ link ,
@@ -84,8 +87,12 @@ class RegisterView(APIView):
 class VerifyRegisterView(APIView):
 
     def get(self, request, token, userId):
-        userFromUrl=User.objects.get(id=userId)
-        tokenFromUser=Token.objects.get(user=userFromUrl)
+        try:
+            userFromUrl=User.objects.get(id=userId)
+            tokenFromUser=Token.objects.get(user=userFromUrl)
+        except:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
 
         if(tokenFromUser.key==token):
             userFromUrl.is_active=True
@@ -107,7 +114,7 @@ class ForgotPasswordView(APIView):
                 return Response(status=status.HTTP_404_NOT_FOUND)
             
             token, created=Token.objects.get_or_create(user=user)
-            link=request.META['HTTP_HOST']+reverse('reset-password', args=[token.key, user.id])
+            link=settings.BACKEND_URL+reverse('reset-password', args=[token.key, user.id])
             send_mail(
                 subject='Reset password',
                 message='Reset password link: '+ link ,
@@ -122,10 +129,13 @@ class ResetPasswordView(APIView):
     def post(self, request, token, userId):
         serializer=ResetPasswordSerializer(data=request.data)
         if serializer.is_valid():
-            print('is Valid')
-            userFromUrl=User.objects.get(id=userId)
-            tokenFromUser=Token.objects.get(user=userFromUrl)
+            #print('is Valid')
 
+            try:
+                userFromUrl=User.objects.get(id=userId)
+                tokenFromUser=Token.objects.get(user=userFromUrl)
+            except:
+                return Response(status=status.HTTP_404_NOT_FOUND)
             if(tokenFromUser.key==token):
                 
                 user=serializer.changeUsersPassword(serializer.verify(request.data), userId)

@@ -18,7 +18,7 @@ class LoginSerializer(serializers.Serializer):
         
         # Try to verify user with login data being username
         user=authenticate(username=data['login'], password=data['password'])
-        print(user)
+        #print(user)
         # If user is None given login might be email
         if user is None: 
             # Try to find user by email
