@@ -102,6 +102,7 @@ class TestAuth(APITestCase):
         response=self.client.post(link, sample_reset_password)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
+
     def test_reset_password_with_bad_link_should_be_404(self):
         user=User.objects.get(username='testusername')
         token, created=Token.objects.get_or_create(user=user)

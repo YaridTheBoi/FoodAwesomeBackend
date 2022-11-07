@@ -46,7 +46,7 @@ class RecipeList(APIView):
         if serializer.is_valid():
             recipe=serializer.create(request)
             if(recipe is not None):
-                return Response(serializer.data)
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
         
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
