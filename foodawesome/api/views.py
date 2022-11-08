@@ -75,8 +75,12 @@ class RecipeDetailed(APIView):
 
     #FIX IT XDDDDDDD
     def delete(self, request, id):
-        recipe=self.get_recipe_by_id(id)
-        recipe.delete()
+        recipeToRemove=self.get_recipe_by_id(id)
+        requestUser=User.objects.get(id=request.user.id)
+        if(recipeToRemove.author!=requestUser):
+            return Response( status=status.HTTP_401_UNAUTHORIZED)
+        
+        recipeToRemove.delete()
         return Response(status=status.HTTP_200_OK)
 
 
