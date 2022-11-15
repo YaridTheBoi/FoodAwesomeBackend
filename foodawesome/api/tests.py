@@ -7,6 +7,10 @@ from rest_framework import status
 from django.contrib.auth.models import User
 from .models import Recipe
 
+
+
+import mock
+
 class TestApi(APITestCase):
 
     def setUp(self):
@@ -15,6 +19,11 @@ class TestApi(APITestCase):
                                         title='test recipe',
                                         ingredients='test ingredients',
                                         description='test description',
+                                        dish_type='OT')
+        recipe=Recipe.objects.create(author=user,
+                                        title='test recipe2',
+                                        ingredients='test ingredients2',
+                                        description='test description2',
                                         dish_type='OT')
         user_with_no_recipe=User.objects.create_user("userWithNoRecipe", 'uwnrmail@mail.com', 'testpassworduwnr')
 
@@ -238,3 +247,16 @@ class TestApi(APITestCase):
         response=self.client.delete(reverse('recipes-detailed', args=[recipe.id]))
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
         self.assertEqual(recipe_old_count, Recipe.objects.count())
+
+
+#===TEST RANDOM RECIPE=====
+
+
+    def fakeRandomChoice(**args):
+        return 1;
+
+    @mock.patch('api.views.random.choice',fakeRandomChoice)
+    def test_random_recipe(self):  
+        response=self.client.get(reverse('random-recipe'))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['id'], 1)

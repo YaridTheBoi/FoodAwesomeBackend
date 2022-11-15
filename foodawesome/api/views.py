@@ -73,7 +73,6 @@ class RecipeDetailed(APIView):
         return Response(serializer.data)
         
 
-    #FIX IT XDDDDDDD
     def delete(self, request, id):
         recipeToRemove=self.get_recipe_by_id(id)
         requestUser=User.objects.get(id=request.user.id)
