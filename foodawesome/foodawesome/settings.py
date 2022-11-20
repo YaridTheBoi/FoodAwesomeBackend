@@ -46,12 +46,17 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'rest_framework',
-    'corsheaders',
-    'rest_framework_simplejwt',
+    'django.contrib.sites',         #external auth
+    'rest_framework',               #api
+    'corsheaders',                  #api
+    'rest_framework_simplejwt',     #token
     'api.apps.ApiConfig',
     'users.apps.UsersConfig',
-    'rest_framework.authtoken'
+    'rest_framework.authtoken',     #token
+    'allauth',                                  #external auth
+    'allauth.account',                          #external auth
+    'allauth.socialaccount',                    #external auth
+    'allauth.socialaccount.providers.google'    #external auth
 ]
 
 MIDDLEWARE = [
@@ -121,6 +126,28 @@ DATABASES = {
     }
 }
 
+# For external authentication
+# https://www.section.io/engineering-education/django-google-oauth/
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend'
+]
+
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'SCOPE': [
+            'profile',
+            'email',
+        ],
+        'AUTH_PARAMS': {
+            'access_type': 'online',
+        }
+    }
+}
+
+
+SIDE_ID = 1     #hehe ustaw to potem na normalne
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
