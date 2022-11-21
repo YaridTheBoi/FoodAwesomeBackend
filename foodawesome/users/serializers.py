@@ -113,3 +113,8 @@ class ResetPasswordSerializer(serializers.Serializer):
         user.save()
 
         return user
+
+
+class GoogleInputSerializer(serializers.Serializer):
+    code=serializers.CharField(style={'placeholder': 'Code'})
+    error=serializers.CharField(style={'placeholder': 'Error'})

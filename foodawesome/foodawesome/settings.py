@@ -195,3 +195,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 #for development. Later change
 CORS_ALLOW_ALL_ORIGINS=True
 
+
+#move to env later
+GOOGLE_OAUTH2_CLIENT_ID='992368695554-n9obe0meo3ua39aggv9qvj4na54kc5g5.apps.googleusercontent.com'
+GOOGLE_OAUTH2_CLIENT_SECRET='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'

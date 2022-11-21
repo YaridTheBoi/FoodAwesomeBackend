@@ -11,10 +11,10 @@ from rest_framework import status
 
 #models
 from django.contrib.auth.models import User
-from .serializers import LoginSerializer, RegisterSerializer, UserSerializer, ForgotPasswordSerializer, ResetPasswordSerializer
+from .serializers import LoginSerializer, RegisterSerializer, UserSerializer, ForgotPasswordSerializer, ResetPasswordSerializer, GoogleInputSerializer
 
 #tokens
-from .tokensUtil import getUserToken
+from .tokensUtil import getUserToken, googleGetAccessToken, googleValidateIdToken
 from rest_framework.authtoken.models import Token
 
 def main(request):
@@ -152,5 +152,20 @@ class ResetPasswordView(APIView):
 # https://github.com/HackSoftware/Django-React-GoogleOauth2-Example/blob/main/server/auth/apis.py#L33
 class GoogleAuthView(APIView):
     def get(self, request):
-        data=request.data
-        return Response(data, status=status.HTTP_200_OK)
+        serializer=GoogleInputSerializer(data= request.data)
+        if(not serializer.is_valid()):
+            return Response("Invalid serializer",status=status.HTTP_400_BAD_REQUEST)
+        
+        val_data= serializer.validated_data
+
+        code=val_data.get('code')
+        error=val_data.get('error')
+
+        if error or not code:
+            return Response("Error or no Code", status=status.HTTP_400_BAD_REQUEST)
+
+        redirect_url=settings.BACKEND_URL+reverse('google')
+
+        access_token=googleGetAccessToken(code, redirect_url)
+
+        return Response(access_token, status=status.HTTP_200_OK)
