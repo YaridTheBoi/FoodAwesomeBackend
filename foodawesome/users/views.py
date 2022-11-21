@@ -146,3 +146,11 @@ class ResetPasswordView(APIView):
 
                 return Response(status=status.HTTP_400_BAD_REQUEST)
         return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+
+# https://github.com/HackSoftware/Django-React-GoogleOauth2-Example/blob/main/server/auth/apis.py#L33
+class GoogleAuthView(APIView):
+    def get(self, request):
+        data=request.data
+        return Response(data, status=status.HTTP_200_OK)
